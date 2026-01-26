@@ -1,23 +1,44 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+let supabaseInstance: SupabaseClient | null = null;
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  const missing = [];
-  if (!supabaseUrl) missing.push('NEXT_PUBLIC_SUPABASE_URL');
-  if (!supabaseAnonKey) missing.push('NEXT_PUBLIC_SUPABASE_ANON_KEY');
-  
-  throw new Error(
-    `Missing Supabase environment variables: ${missing.join(', ')}\n` +
-    `Please create a .env.local file in the project root with:\n` +
-    `NEXT_PUBLIC_SUPABASE_URL=your-project-url\n` +
-    `NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key\n` +
-    `\nAfter adding the file, restart the dev server with: npm run dev`
-  );
+function getSupabaseClient(): SupabaseClient {
+  if (supabaseInstance) {
+    return supabaseInstance;
+  }
+
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!supabaseUrl || !supabaseAnonKey) {
+    const missing = [];
+    if (!supabaseUrl) missing.push('NEXT_PUBLIC_SUPABASE_URL');
+    if (!supabaseAnonKey) missing.push('NEXT_PUBLIC_SUPABASE_ANON_KEY');
+    
+    throw new Error(
+      `Missing Supabase environment variables: ${missing.join(', ')}\n` +
+      `Please add these to your Vercel environment variables:\n` +
+      `NEXT_PUBLIC_SUPABASE_URL=your-project-url\n` +
+      `NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key`
+    );
+  }
+
+  supabaseInstance = createClient(supabaseUrl, supabaseAnonKey);
+  return supabaseInstance;
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// Export a getter that creates the client lazily
+// This prevents build-time errors when env vars aren't available during SSR/prerender
+export const supabase = new Proxy({} as SupabaseClient, {
+  get(_target, prop) {
+    const client = getSupabaseClient();
+    const value = client[prop as keyof SupabaseClient];
+    if (typeof value === 'function') {
+      return value.bind(client);
+    }
+    return value;
+  },
+});
 
 // Database types
 export type Sighting = {
