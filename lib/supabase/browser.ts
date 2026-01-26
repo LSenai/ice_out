@@ -27,18 +27,25 @@ function getSupabaseClient(): SupabaseClient {
   return supabaseInstance;
 }
 
-// Export a getter that creates the client lazily
-// This prevents build-time errors when env vars aren't available during SSR/prerender
-export const supabase = new Proxy({} as SupabaseClient, {
-  get(_target, prop) {
-    const client = getSupabaseClient();
-    const value = client[prop as keyof SupabaseClient];
-    if (typeof value === 'function') {
-      return value.bind(client);
-    }
-    return value;
-  },
-});
+// Export the client directly - it will be initialized on first access
+// Since this is only used in client components, it won't cause build errors
+export const supabase = (() => {
+  // Create a getter that initializes on first access
+  let client: SupabaseClient | null = null;
+  
+  return new Proxy({} as SupabaseClient, {
+    get(_target, prop) {
+      if (!client) {
+        client = getSupabaseClient();
+      }
+      const value = client[prop as keyof SupabaseClient];
+      if (typeof value === 'function') {
+        return value.bind(client);
+      }
+      return value;
+    },
+  });
+})();
 
 // Database types
 export type Sighting = {

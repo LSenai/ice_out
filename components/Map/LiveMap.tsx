@@ -89,11 +89,16 @@ export default function LiveMap({ onMarkerClick, showActiveOnly = false }: LiveM
         
         const { data, error: fetchError } = await query;
         
-        if (fetchError) throw fetchError;
+        if (fetchError) {
+          console.error('Supabase error:', fetchError);
+          throw new Error(fetchError.message || 'Failed to load sightings');
+        }
         setSightings(data || []);
         setLoading(false);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to load sightings');
+        const errorMessage = err instanceof Error ? err.message : 'Failed to load sightings';
+        console.error('Error loading sightings:', err);
+        setError(errorMessage);
         setLoading(false);
       }
     }
