@@ -1,0 +1,71 @@
+0 verbose cli /usr/bin/node-22 /usr/bin/npm
+1 info using npm@10.9.3
+2 info using node@v22.20.0
+3 silly config load:file:/usr/lib/node_modules_22/npm/npmrc
+4 silly config load:file:/home/leo/dev/OA/ice_out/ice_out/.npmrc
+5 silly config load:file:/home/leo/.npmrc
+6 silly config load:file:/etc/npmrc
+7 verbose title npm install leaflet react-leaflet @supabase/supabase-js exifr tsx csv-parse
+8 verbose argv "install" "leaflet" "react-leaflet" "@supabase/supabase-js" "exifr" "tsx" "csv-parse"
+9 verbose logfile logs-max:10 dir:/home/leo/dev/OA/ice_out/ice_out/.npm-cache/_logs/2026-01-26T21_43_17_091Z-
+10 verbose logfile /home/leo/dev/OA/ice_out/ice_out/.npm-cache/_logs/2026-01-26T21_43_17_091Z-debug-0.log
+11 silly logfile done cleaning log files
+12 silly packumentCache heap:4345298944 maxSize:1086324736 maxEntrySize:543162368
+13 silly idealTree buildDeps
+14 silly fetch manifest leaflet@*
+15 silly packumentCache full:https://registry.npmjs.org/leaflet cache-miss
+16 http fetch GET https://registry.npmjs.org/leaflet attempt 1 failed with EAI_AGAIN
+17 http fetch GET https://registry.npmjs.org/leaflet attempt 2 failed with EAI_AGAIN
+18 http fetch GET https://registry.npmjs.org/leaflet attempt 3 failed with EAI_AGAIN
+19 silly fetch manifest react-leaflet@*
+20 silly packumentCache full:https://registry.npmjs.org/react-leaflet cache-miss
+21 http fetch GET https://registry.npmjs.org/react-leaflet attempt 1 failed with EAI_AGAIN
+22 http fetch GET https://registry.npmjs.org/react-leaflet attempt 2 failed with EAI_AGAIN
+23 http fetch GET https://registry.npmjs.org/react-leaflet attempt 3 failed with EAI_AGAIN
+24 silly fetch manifest @supabase/supabase-js@*
+25 silly packumentCache full:https://registry.npmjs.org/@supabase%2fsupabase-js cache-miss
+26 http fetch GET https://registry.npmjs.org/@supabase%2fsupabase-js attempt 1 failed with EAI_AGAIN
+27 http fetch GET https://registry.npmjs.org/@supabase%2fsupabase-js attempt 2 failed with EAI_AGAIN
+28 http fetch GET https://registry.npmjs.org/@supabase%2fsupabase-js attempt 3 failed with EAI_AGAIN
+29 silly fetch manifest exifr@*
+30 silly packumentCache full:https://registry.npmjs.org/exifr cache-miss
+31 http fetch GET https://registry.npmjs.org/exifr attempt 1 failed with EAI_AGAIN
+32 http fetch GET https://registry.npmjs.org/exifr attempt 2 failed with EAI_AGAIN
+33 http fetch GET https://registry.npmjs.org/exifr attempt 3 failed with EAI_AGAIN
+34 silly fetch manifest tsx@*
+35 silly packumentCache full:https://registry.npmjs.org/tsx cache-miss
+36 http fetch GET https://registry.npmjs.org/tsx attempt 1 failed with EAI_AGAIN
+37 http fetch GET https://registry.npmjs.org/tsx attempt 2 failed with EAI_AGAIN
+38 http fetch GET https://registry.npmjs.org/tsx attempt 3 failed with EAI_AGAIN
+39 silly fetch manifest csv-parse@*
+40 silly packumentCache full:https://registry.npmjs.org/csv-parse cache-miss
+41 http fetch GET https://registry.npmjs.org/csv-parse attempt 1 failed with EAI_AGAIN
+42 http fetch GET https://registry.npmjs.org/csv-parse attempt 2 failed with EAI_AGAIN
+43 http fetch GET https://registry.npmjs.org/csv-parse attempt 3 failed with EAI_AGAIN
+44 silly placeDep ROOT @supabase/supabase-js@ OK for: nextjs@0.1.0 want: *
+45 silly placeDep ROOT csv-parse@ OK for: nextjs@0.1.0 want: *
+46 silly placeDep ROOT exifr@ OK for: nextjs@0.1.0 want: *
+47 silly placeDep ROOT leaflet@ OK for: nextjs@0.1.0 want: *
+48 silly placeDep ROOT react-leaflet@ OK for: nextjs@0.1.0 want: *
+49 silly placeDep ROOT tsx@ OK for: nextjs@0.1.0 want: *
+50 verbose type system
+51 verbose stack FetchError: request to https://registry.npmjs.org/@supabase%2fsupabase-js failed, reason: getaddrinfo EAI_AGAIN registry.npmjs.org
+51 verbose stack     at ClientRequest.<anonymous> (/usr/lib/node_modules_22/npm/node_modules/minipass-fetch/lib/index.js:130:14)
+51 verbose stack     at ClientRequest.emit (node:events:519:28)
+51 verbose stack     at emitErrorEvent (node:_http_client:105:11)
+51 verbose stack     at _destroy (node:_http_client:898:9)
+51 verbose stack     at onSocketNT (node:_http_client:918:5)
+51 verbose stack     at process.processTicksAndRejections (node:internal/process/task_queues:91:21)
+52 error code EAI_AGAIN
+53 error syscall getaddrinfo
+54 error errno EAI_AGAIN
+55 error request to https://registry.npmjs.org/@supabase%2fsupabase-js failed, reason: getaddrinfo EAI_AGAIN registry.npmjs.org
+56 silly unfinished npm timer reify 1769463797432
+57 silly unfinished npm timer reify:loadTrees 1769463797433
+58 verbose cwd /home/leo/dev/OA/ice_out/ice_out
+59 verbose os Linux 6.8.5-301.fc40.x86_64
+60 verbose node v22.20.0
+61 verbose npm  v10.9.3
+62 verbose exit 1
+63 verbose code 1
+64 error A complete log of this run can be found in: /home/leo/dev/OA/ice_out/ice_out/.npm-cache/_logs/2026-01-26T21_43_17_091Z-debug-0.log
