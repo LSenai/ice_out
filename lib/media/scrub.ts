@@ -3,8 +3,15 @@ import exifr from 'exifr';
 /**
  * Strip EXIF data from an image file, preserving only essential metadata if needed
  * Returns a new Blob with scrubbed data
+ * Note: This function requires browser APIs and will only work in the browser
  */
 export async function scrubImageExif(file: File): Promise<Blob> {
+  // Guard: Only run in browser
+  if (typeof window === 'undefined' || typeof document === 'undefined') {
+    // In SSR/build, return file as-is
+    return file;
+  }
+
   // Read the file as array buffer
   const arrayBuffer = await file.arrayBuffer();
   
@@ -79,8 +86,15 @@ export async function scrubVideoMetadata(file: File): Promise<Blob> {
 
 /**
  * Main scrubbing function - routes to appropriate handler
+ * Note: This function requires browser APIs and will only work in the browser
  */
 export async function scrubMediaFile(file: File): Promise<Blob> {
+  // Guard: Only run in browser
+  if (typeof window === 'undefined') {
+    // In SSR/build, return file as-is
+    return file;
+  }
+
   if (isVideoFile(file)) {
     return scrubVideoMetadata(file);
   } else {

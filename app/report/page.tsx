@@ -2,13 +2,20 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import dynamic from 'next/dynamic';
-import { MapContainer, TileLayer } from 'react-leaflet';
+import dynamicImport from 'next/dynamic';
 import { supabase } from '@/lib/supabase/browser';
 import { scrubMediaFile } from '@/lib/media/scrub';
-import MapWithPin from '@/components/Map/MapWithPin';
 
-const MapWithPinDynamic = dynamic(() => import('@/components/Map/MapWithPin'), {
+// Dynamically import all Leaflet components to avoid SSR issues
+const MapContainer = dynamicImport(
+  () => import('react-leaflet').then((mod) => mod.MapContainer),
+  { ssr: false }
+);
+const TileLayer = dynamicImport(
+  () => import('react-leaflet').then((mod) => mod.TileLayer),
+  { ssr: false }
+);
+const MapWithPinDynamic = dynamicImport(() => import('@/components/Map/MapWithPin'), {
   ssr: false,
 });
 
