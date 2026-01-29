@@ -151,7 +151,13 @@ export default function Home() {
                   Admin
                 </Link>
               )}
-              <button onClick={() => signOut()} className="ice-button ice-button--ghost">
+              <button
+                onClick={async () => {
+                  await signOut();
+                  router.refresh();
+                }}
+                className="ice-button ice-button--ghost"
+              >
                 Sign out
               </button>
             </>
