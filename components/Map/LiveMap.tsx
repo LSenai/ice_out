@@ -105,6 +105,13 @@ export default function LiveMap({ onMarkerClick, showActiveOnly = false }: LiveM
         setSightings(data || []);
         setLoading(false);
       } catch (err) {
+        const isAborted =
+          (err instanceof Error && err.name === 'AbortError') ||
+          (err instanceof Error && err.message?.includes('AbortError'));
+        if (isAborted) {
+          setLoading(false);
+          return;
+        }
         const errorMessage = err instanceof Error ? err.message : 'Failed to load sightings';
         console.error('Error loading sightings:', err);
         setError(errorMessage);

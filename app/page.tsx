@@ -32,35 +32,42 @@ export default function Home() {
 
   useEffect(() => {
     async function loadStats() {
-      const now = new Date();
-      const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+      try {
+        const now = new Date();
+        const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
 
-      // Load active sightings
-      const { data: activeData } = await supabase
-        .from('sightings')
-        .select('*')
-        .gte('event_time', twentyFourHoursAgo.toISOString());
+        // Load active sightings
+        const { data: activeData } = await supabase
+          .from('sightings')
+          .select('*')
+          .gte('event_time', twentyFourHoursAgo.toISOString());
 
-      // Load verified count (verified, active, or confirmed)
-      const { data: verifiedData } = await supabase
-        .from('sightings')
-        .select('id')
-        .in('status', ['verified', 'active', 'confirmed'])
-        .gte('event_time', twentyFourHoursAgo.toISOString());
+        // Load verified count (verified, active, or confirmed)
+        const { data: verifiedData } = await supabase
+          .from('sightings')
+          .select('id')
+          .in('status', ['verified', 'active', 'confirmed'])
+          .gte('event_time', twentyFourHoursAgo.toISOString());
 
-      // Load recent sightings for sidebar
-      const { data: recentData } = await supabase
-        .from('sightings')
-        .select('*')
-        .order('event_time', { ascending: false })
-        .limit(4);
+        // Load recent sightings for sidebar
+        const { data: recentData } = await supabase
+          .from('sightings')
+          .select('*')
+          .order('event_time', { ascending: false })
+          .limit(4);
 
-      setStats({
-        active: activeData?.length || 0,
-        verified: verifiedData?.length || 0,
-        nearest: null, // TODO: Calculate based on user location
-      });
-      setRecentSightings(recentData || []);
+        setStats({
+          active: activeData?.length || 0,
+          verified: verifiedData?.length || 0,
+          nearest: null, // TODO: Calculate based on user location
+        });
+        setRecentSightings(recentData || []);
+      } catch (err) {
+        const isAborted =
+          (err instanceof Error && err.name === 'AbortError') ||
+          (err instanceof Error && err.message?.includes('AbortError'));
+        if (!isAborted) console.error('Error loading stats:', err);
+      }
 
       // Subscribe to changes
       const channel = supabase

@@ -39,16 +39,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     let mounted = true;
 
     async function init() {
-      const { data: { session: s } } = await supabase.auth.getSession();
-      if (!mounted) return;
-      setSession(s);
-      setUser(s?.user ?? null);
-      if (s?.user?.id) {
-        await fetchRole(s.user.id);
-      } else {
-        setRole(null);
+      try {
+        const { data: { session: s } } = await supabase.auth.getSession();
+        if (!mounted) return;
+        setSession(s);
+        setUser(s?.user ?? null);
+        if (s?.user?.id) {
+          await fetchRole(s.user.id);
+        } else {
+          setRole(null);
+        }
+      } catch (err) {
+        const isAborted =
+          (err instanceof Error && err.name === 'AbortError') ||
+          (err instanceof Error && err.message?.includes('AbortError'));
+        if (!isAborted) throw err;
+      } finally {
+        if (mounted) setLoading(false);
       }
-      setLoading(false);
     }
 
     init();
