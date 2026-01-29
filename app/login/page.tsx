@@ -12,7 +12,7 @@ function LoginForm() {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [mode, setMode] = useState<'magic' | 'password' | 'signup'>('magic');
+  const [mode, setMode] = useState<'magic' | 'password'>('magic');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
@@ -52,26 +52,6 @@ function LoginForm() {
     router.refresh();
   };
 
-  const handleSignUp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setMessage(null);
-    const { error } = await supabase.auth.signUp({
-      email: email.trim(),
-      password,
-      options: { emailRedirectTo: `${window.location.origin}${redirectTo}` },
-    });
-    setLoading(false);
-    if (error) {
-      setMessage({ type: 'error', text: error.message });
-      return;
-    }
-    setMessage({
-      type: 'success',
-      text: 'Check your email to confirm your account, or sign in with password if already confirmed.',
-    });
-  };
-
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-6">
       <div className="ice-panel w-full max-w-md p-6">
@@ -83,8 +63,7 @@ function LoginForm() {
         <form
           onSubmit={(e) => {
             if (mode === 'magic') handleMagicLink(e);
-            else if (mode === 'password') handlePassword(e);
-            else handleSignUp(e);
+            else handlePassword(e);
           }}
           className="space-y-4"
         >
@@ -113,7 +92,7 @@ function LoginForm() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                required={mode === 'password' || mode === 'signup'}
+                required={mode === 'password'}
                 className="w-full bg-black border-2 border-[var(--ice-border)] rounded px-3 py-2 text-white placeholder:text-white/40"
               />
             </div>
@@ -142,23 +121,12 @@ function LoginForm() {
               </button>
             )}
             {mode === 'password' && (
-              <>
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="ice-button ice-button--alert w-full"
-                >
-                  {loading ? 'Signing in…' : 'Sign in'}
-                </button>
-              </>
-            )}
-            {mode === 'signup' && (
               <button
                 type="submit"
                 disabled={loading}
                 className="ice-button ice-button--alert w-full"
               >
-                {loading ? 'Creating account…' : 'Sign up'}
+                {loading ? 'Signing in…' : 'Sign in'}
               </button>
             )}
 
@@ -170,24 +138,6 @@ function LoginForm() {
               >
                 {mode === 'magic' ? 'Use password' : 'Use magic link'}
               </button>
-              {mode === 'password' && (
-                <button
-                  type="button"
-                  onClick={() => setMode('signup')}
-                  className="ice-button ice-button--ghost text-xs"
-                >
-                  Sign up
-                </button>
-              )}
-              {mode === 'signup' && (
-                <button
-                  type="button"
-                  onClick={() => setMode('password')}
-                  className="ice-button ice-button--ghost text-xs"
-                >
-                  Sign in
-                </button>
-              )}
             </div>
           </div>
         </form>

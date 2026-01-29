@@ -16,6 +16,9 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [inviteEmail, setInviteEmail] = useState('');
+  const [inviteLoading, setInviteLoading] = useState(false);
+  const [inviteMessage, setInviteMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   useEffect(() => {
     if (authLoading) return;
@@ -57,6 +60,43 @@ export default function AdminPage() {
       );
     }
     setUpdatingId(null);
+  };
+
+  const handleInvite = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const email = inviteEmail.trim();
+    if (!email) return;
+    setInviteLoading(true);
+    setInviteMessage(null);
+    setError(null);
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      setInviteMessage({ type: 'error', text: 'Not signed in.' });
+      setInviteLoading(false);
+      return;
+    }
+    try {
+      const res = await fetch('/api/invite-validator', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email,
+          access_token: session.access_token,
+          refresh_token: session.refresh_token,
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setInviteMessage({ type: 'error', text: (data.error as string) || res.statusText });
+        setInviteLoading(false);
+        return;
+      }
+      setInviteMessage({ type: 'success', text: 'Invite sent. They will get an email to sign in and become a trusted verifier.' });
+      setInviteEmail('');
+    } catch (err) {
+      setInviteMessage({ type: 'error', text: err instanceof Error ? err.message : 'Request failed' });
+    }
+    setInviteLoading(false);
   };
 
   if (authLoading || (user && role !== 'admin' && !error)) {
@@ -103,6 +143,47 @@ export default function AdminPage() {
           <p className="ice-mono text-xs text-[#ff3b30]">{error}</p>
         </div>
       )}
+
+      <section className="ice-panel mb-8">
+        <h2 className="ice-heading text-lg mb-2">Invite trusted verifier</h2>
+        <p className="ice-mono text-xs text-white/60 mb-4">
+          Send an invite link to an email. When they sign in, they will get the trusted role and can confirm sightings (Level 3).
+        </p>
+        <form onSubmit={handleInvite} className="flex flex-wrap items-end gap-3">
+          <div className="flex-1 min-w-[200px]">
+            <label htmlFor="invite-email" className="ice-mono text-xs text-white/80 block mb-1">
+              Email
+            </label>
+            <input
+              id="invite-email"
+              type="email"
+              value={inviteEmail}
+              onChange={(e) => setInviteEmail(e.target.value)}
+              placeholder="verifier@example.com"
+              required
+              className="w-full bg-black border-2 border-[var(--ice-border)] rounded px-3 py-2 text-white placeholder:text-white/40"
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={inviteLoading}
+            className="ice-button ice-button--alert"
+          >
+            {inviteLoading ? 'Sending…' : 'Send invite'}
+          </button>
+        </form>
+        {inviteMessage && (
+          <div
+            className={`mt-3 p-3 border-2 ${
+              inviteMessage.type === 'success' ? 'border-[var(--ice-yellow)]' : 'border-[var(--ice-red)]'
+            }`}
+          >
+            <p className={`ice-mono text-xs ${inviteMessage.type === 'success' ? 'text-[var(--ice-yellow)]' : 'text-[var(--ice-red)]'}`}>
+              {inviteMessage.text}
+            </p>
+          </div>
+        )}
+      </section>
 
       {loading ? (
         <p className="ice-mono text-white/60">Loading profiles…</p>
