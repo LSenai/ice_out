@@ -112,9 +112,6 @@ export default function SightingDrawer({ sighting, onClose }: SightingDrawerProp
   const validationThreshold = sighting.media?.length ? 2 : 3;
   const validationsNeeded = Math.max(0, validationThreshold - sighting.validations_count);
 
-  const isVerified = sighting.status === 'verified';
-  const validationsNeeded = Math.max(0, 3 - sighting.validations_count);
-
   return (
     <div className="ice-panel fixed bottom-0 left-0 right-0 z-50 max-h-[60vh] overflow-y-auto border-t-2 border-white p-6 sm:left-auto sm:right-6 sm:top-6 sm:bottom-auto sm:max-h-[80vh] sm:max-w-md sm:border-t-0">
       <div className="flex items-start justify-between mb-4">
