@@ -35,6 +35,15 @@ function createVerifiedIcon(): L.DivIcon {
   });
 }
 
+function createConfirmedIcon(): L.DivIcon {
+  return L.divIcon({
+    className: 'confirmed-marker',
+    html: '<div class="confirmed-badge"></div>',
+    iconSize: [22, 22],
+    iconAnchor: [11, 11],
+  });
+}
+
 function createHistoricalIcon(): L.DivIcon {
   return L.divIcon({
     className: 'historical-marker',
@@ -173,11 +182,13 @@ export default function LiveMap({ onMarkerClick, showActiveOnly = false }: LiveM
         {sightings.map((sighting) => {
           const isHistorical = new Date(sighting.event_time) < twentyFourHoursAgo;
           const icon =
-            sighting.status === 'verified'
-              ? createVerifiedIcon()
-              : isHistorical
-              ? createHistoricalIcon()
-              : createUnverifiedIcon();
+            sighting.status === 'confirmed'
+              ? createConfirmedIcon()
+              : sighting.status === 'verified' || sighting.status === 'active'
+                ? createVerifiedIcon()
+                : isHistorical
+                  ? createHistoricalIcon()
+                  : createUnverifiedIcon();
 
           return (
             <Marker
@@ -200,7 +211,7 @@ export default function LiveMap({ onMarkerClick, showActiveOnly = false }: LiveM
                   </p>
                   {sighting.notes && <p className="mt-1">{sighting.notes}</p>}
                   <p className="mt-1 text-xs">
-                    Status: {sighting.status} ({sighting.validations_count} validations)
+                    Status: {sighting.status === 'confirmed' ? 'Confirmed (Level 3)' : sighting.status} ({sighting.validations_count} validations)
                   </p>
                 </div>
               </Popup>
@@ -243,6 +254,18 @@ export default function LiveMap({ onMarkerClick, showActiveOnly = false }: LiveM
           background-color: #ff3b30;
           border: 2px solid #ffffff;
           transform: rotate(45deg);
+        }
+        .confirmed-marker {
+          background: transparent;
+          border: none;
+        }
+        .confirmed-badge {
+          width: 22px;
+          height: 22px;
+          background-color: #ff3b30;
+          border: 2px solid #ffffff;
+          border-radius: 50%;
+          box-shadow: 0 0 0 2px #ff3b30;
         }
         .historical-marker {
           background: transparent;

@@ -2,9 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { supabase, type Sighting } from '@/lib/supabase/browser';
 import SightingDrawer from '@/components/Sighting/SightingDrawer';
+import { useAuth } from '@/components/Auth/AuthProvider';
 
 // Dynamically import LiveMap to avoid SSR issues with Leaflet
 const LiveMap = dynamic(() => import('@/components/Map/LiveMap'), {
@@ -18,6 +20,7 @@ const LiveMap = dynamic(() => import('@/components/Map/LiveMap'), {
 
 export default function Home() {
   const router = useRouter();
+  const { user, role, signOut } = useAuth();
   const [selectedSighting, setSelectedSighting] = useState<Sighting | null>(null);
   const [stats, setStats] = useState({
     active: 0,
@@ -38,11 +41,11 @@ export default function Home() {
         .select('*')
         .gte('event_time', twentyFourHoursAgo.toISOString());
 
-      // Load verified count
+      // Load verified count (verified, active, or confirmed)
       const { data: verifiedData } = await supabase
         .from('sightings')
         .select('id')
-        .eq('status', 'verified')
+        .in('status', ['verified', 'active', 'confirmed'])
         .gte('event_time', twentyFourHoursAgo.toISOString());
 
       // Load recent sightings for sidebar
@@ -134,6 +137,22 @@ export default function Home() {
           >
             Report Sighting
           </button>
+          {user ? (
+            <>
+              {role === 'admin' && (
+                <Link href="/admin" className="ice-button ice-button--ghost">
+                  Admin
+                </Link>
+              )}
+              <button onClick={() => signOut()} className="ice-button ice-button--ghost">
+                Sign out
+              </button>
+            </>
+          ) : (
+            <Link href="/login" className="ice-button ice-button--ghost">
+              Sign in
+            </Link>
+          )}
         </div>
       </header>
 
@@ -230,7 +249,7 @@ export default function Home() {
                           </span>
                           <span
                             className={`ice-mono ${
-                              sighting.status === 'verified'
+                              sighting.status === 'confirmed' || sighting.status === 'verified' || sighting.status === 'active'
                                 ? 'text-[#ff3b30]'
                                 : 'text-[#ffd700]'
                             }`}
@@ -327,14 +346,16 @@ export default function Home() {
                     const isHistorical = new Date(sighting.event_time) < twentyFourHoursAgo;
                     const statusText = isHistorical
                       ? 'Historic'
-                      : sighting.status === 'verified'
-                      ? 'Verified'
-                      : 'Unverified';
+                      : sighting.status === 'confirmed'
+                        ? 'Confirmed'
+                        : sighting.status === 'verified' || sighting.status === 'active'
+                          ? 'Verified'
+                          : 'Unverified';
                     const statusColor = isHistorical
                       ? 'text-[#4a4a4a]'
-                      : sighting.status === 'verified'
-                      ? 'text-[#ff3b30]'
-                      : 'text-[#ffd700]';
+                      : sighting.status === 'confirmed' || sighting.status === 'verified' || sighting.status === 'active'
+                        ? 'text-[#ff3b30]'
+                        : 'text-[#ffd700]';
 
                     return (
                       <tr
@@ -350,7 +371,7 @@ export default function Home() {
                         </td>
                         <td className="px-4 py-3 text-white/70">{sighting.activity_type}</td>
                         <td className={`px-4 py-3 ${statusColor}`}>{statusText}</td>
-                        <td className="px-4 py-3">{sighting.validations_count}/3</td>
+                        <td className="px-4 py-3">{sighting.validations_count}/{sighting.media?.length ? 2 : 3}</td>
                       </tr>
                     );
                   })

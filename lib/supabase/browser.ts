@@ -48,6 +48,8 @@ export const supabase = (() => {
 })();
 
 // Database types
+export type SightingStatus = 'unverified' | 'verified' | 'active' | 'confirmed';
+
 export type Sighting = {
   id: string;
   created_at: string;
@@ -57,7 +59,7 @@ export type Sighting = {
   activity_type: string;
   notes: string | null;
   media: Array<{ path: string; type: string; thumbPath?: string }>;
-  status: 'unverified' | 'verified';
+  status: SightingStatus;
   validations_count: number;
 };
 
@@ -65,7 +67,21 @@ export type Validation = {
   id: string;
   created_at: string;
   sighting_id: string;
-  validator_hash: string;
+  validator_id: string | null;
+  device_fingerprint: string | null;
+  is_within_range: boolean;
+  /** @deprecated legacy; new inserts use device_fingerprint */
+  validator_hash: string | null;
+  /** @deprecated do not store validator coordinates */
   validator_lat: number | null;
+  /** @deprecated do not store validator coordinates */
   validator_lng: number | null;
+};
+
+export type ProfileRole = 'anonymous' | 'trusted' | 'admin';
+
+export type Profile = {
+  id: string;
+  role: ProfileRole;
+  updated_at: string;
 };

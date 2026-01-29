@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Anton, JetBrains_Mono, Inter } from "next/font/google";
 import "./globals.css";
+import { AuthProvider } from "@/components/Auth/AuthProvider";
 
 const displayFont = Anton({
   variable: "--font-display",
@@ -34,7 +35,7 @@ export default function RootLayout({
       <body
         className={`${displayFont.variable} ${bodyFont.variable} ${monoFont.variable} antialiased`}
       >
-        {children}
+        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   );
